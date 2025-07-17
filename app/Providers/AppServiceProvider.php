@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Course;
+use App\Models\Comment;
+use App\Policies\CoursePolicy;
+use App\Policies\CommentPolicy;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,4 +25,9 @@ class AppServiceProvider extends ServiceProvider
     {
         //
     }
+
+    protected $policies = [
+        Course::class => CoursePolicy::class,
+        Comment::class => CommentPolicy::class,
+    ];
 }
