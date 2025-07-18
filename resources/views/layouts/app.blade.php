@@ -9,7 +9,7 @@
     <meta name="description" content="@yield('meta_description', 'EduApp - Platform pembelajaran online terpercaya')">
     <meta name="keywords" content="@yield('meta_keywords', 'education, learning, courses, online learning')">
     
-    <title>{{ config('app.name', 'Laravel') }} - @yield('title')</title>
+    <title>{{ config('app.name', 'EduMate') }} - @yield('title')</title>
     
     <!-- Preload critical resources untuk performance -->
     {{-- <link rel="preload" href="{{ asset('fonts/inter-var.woff2') }}" as="font" type="font/woff2" crossorigin> --}}
