@@ -14,7 +14,7 @@
     <!-- Preload critical resources untuk performance -->
     {{-- <link rel="preload" href="{{ asset('fonts/inter-var.woff2') }}" as="font" type="font/woff2" crossorigin> --}}
     
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- CSS untuk smooth transitions dan improved animations -->
     <style>
