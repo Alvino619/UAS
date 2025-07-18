@@ -38,6 +38,9 @@ class CourseController extends Controller
         $thumbnailPath = null;
         if ($request->hasFile('thumbnail')) {
             $thumbnailPath = $request->file('thumbnail')->store('thumbnails', 'public');
+            
+            // Copy file ke public/storage untuk akses langsung
+            $this->copyToPublicStorage($thumbnailPath);
         }
 
         $course = Course::create([
@@ -81,10 +84,17 @@ class CourseController extends Controller
         ]);
 
         if ($request->hasFile('thumbnail')) {
+            // Hapus file lama
             if ($course->thumbnail) {
                 Storage::disk('public')->delete($course->thumbnail);
+                $this->deleteFromPublicStorage($course->thumbnail);
             }
+            
+            // Upload file baru
             $course->thumbnail = $request->file('thumbnail')->store('thumbnails', 'public');
+            
+            // Copy file ke public/storage
+            $this->copyToPublicStorage($course->thumbnail);
         }
 
         $course->update([
@@ -105,6 +115,7 @@ class CourseController extends Controller
 
         if ($course->thumbnail) {
             Storage::disk('public')->delete($course->thumbnail);
+            $this->deleteFromPublicStorage($course->thumbnail);
         }
 
         $course->delete();
@@ -157,6 +168,9 @@ class CourseController extends Controller
         
         if ($request->hasFile('file_path')) {
             $materialData['file_path'] = $request->file('file_path')->store('materials', 'public');
+            
+            // Copy material file ke public/storage juga
+            $this->copyToPublicStorage($materialData['file_path']);
         }
 
         $course->materials()->create($materialData);
@@ -170,10 +184,56 @@ class CourseController extends Controller
 
         if ($material->file_path) {
             Storage::disk('public')->delete($material->file_path);
+            $this->deleteFromPublicStorage($material->file_path);
         }
 
         $material->delete();
 
         return redirect()->back()->with('success', 'Material deleted successfully');
+    }
+
+    /**
+     * Copy file dari storage/app/public ke public/storage
+     */
+    private function copyToPublicStorage($filePath)
+    {
+        if (!$filePath) return;
+
+        try {
+            $sourcePath = storage_path('app/public/' . $filePath);
+            $targetPath = public_path('storage/' . $filePath);
+            
+            // Buat directory jika belum ada
+            $targetDir = dirname($targetPath);
+            if (!file_exists($targetDir)) {
+                mkdir($targetDir, 0755, true);
+            }
+            
+            // Copy file
+            if (file_exists($sourcePath)) {
+                copy($sourcePath, $targetPath);
+            }
+        } catch (\Exception $e) {
+            // Log error tapi jangan stop process
+            \Log::error('Failed to copy file to public storage: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Hapus file dari public/storage
+     */
+    private function deleteFromPublicStorage($filePath)
+    {
+        if (!$filePath) return;
+
+        try {
+            $targetPath = public_path('storage/' . $filePath);
+            if (file_exists($targetPath)) {
+                unlink($targetPath);
+            }
+        } catch (\Exception $e) {
+            // Log error tapi jangan stop process
+            \Log::error('Failed to delete file from public storage: ' . $e->getMessage());
+        }
     }
 }
