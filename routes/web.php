@@ -8,6 +8,18 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CourseApprovalController;
 
+// Add this before your existing routes
+Route::get('/storage/{folder}/{file}', function ($folder, $file) {
+    $path = storage_path("app/public/{$folder}/{$file}");
+    
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    $mime = mime_content_type($path);
+    return response()->file($path, ['Content-Type' => $mime]);
+})->where('file', '.*');
+
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/courses', [HomeController::class, 'courses'])->name('courses.index');
