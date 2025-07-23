@@ -39,10 +39,6 @@ class CourseApprovalController extends Controller
      */
     public function reject(Request $request, Course $course)
     {
-        $request->validate([
-            'rejection_reason' => 'required|string|max:255'
-        ]);
-
         $course->update([
             'status' => 'rejected',
             'rejection_reason' => $request->rejection_reason
